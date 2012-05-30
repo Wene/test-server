@@ -11,6 +11,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwidget.cpp
+        mainwidget.cpp \
+    chatconnection.cpp
 
-HEADERS  += mainwidget.h
+HEADERS  += mainwidget.h \
+    chatconnection.h

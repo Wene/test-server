@@ -3,23 +3,36 @@
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
 {
-    this->setWindowTitle(trUtf8("Test Server App"));
+    //Window Settings
+    this->setWindowTitle(tr("Test Chat Server"));
     this->resize(600,250);
-    VLayout = new QVBoxLayout(this);
-    Display = new QTextEdit();
-    Display->setReadOnly(true);
-    Display->setFontFamily("courier");
-    Display->setFontPointSize(10);
-    VLayout->addWidget(Display);
-    HLayout = new QHBoxLayout();
-    VLayout->addLayout(HLayout);
-    BtnStart = new QPushButton(trUtf8("Server Starten"));
-    BtnStop = new QPushButton(trUtf8("Server Stoppen"));
-    BtnQuit = new QPushButton(trUtf8("Beenden"));
-    HLayout->addWidget(BtnStart);
-    HLayout->addWidget(BtnStop);
-    HLayout->addStretch();
-    HLayout->addWidget(BtnQuit);
+
+    //Layout
+    LayMain = new QVBoxLayout(this);
+    EdtDisplay = new QTextEdit();
+    EdtDisplay->setReadOnly(true);
+    EdtDisplay->setFontFamily("courier");
+    EdtDisplay->setFontPointSize(10);
+    LayMain->addWidget(EdtDisplay);
+    LayConfig = new QHBoxLayout();
+    LayMain->addLayout(LayConfig);
+    LblPort = new QLabel(tr("Port:"));
+    LayConfig->addWidget(LblPort);
+    BoxPort = new QSpinBox();
+    BoxPort->setMinimum(1024);
+    BoxPort->setMaximum(49151);
+    BoxPort->setValue(2342);
+    LayConfig->addWidget(BoxPort);
+    LayConfig->addStretch();
+    LayButtons = new QHBoxLayout();
+    LayMain->addLayout(LayButtons);
+    BtnStart = new QPushButton(tr("Server Starten"));
+    BtnStop = new QPushButton(tr("Server Stoppen"));
+    BtnQuit = new QPushButton(tr("Beenden"));
+    LayButtons->addWidget(BtnStart);
+    LayButtons->addWidget(BtnStop);
+    LayButtons->addStretch();
+    LayButtons->addWidget(BtnQuit);
 
     connect(BtnQuit, SIGNAL(clicked()), this, SLOT(close()));
     connect(BtnStart, SIGNAL(clicked()), this, SLOT(ServerStart()));
@@ -28,8 +41,8 @@ MainWidget::MainWidget(QWidget *parent)
     SocketList = new QList<QTcpSocket*>();
     ServerIsActive = false;
 
-    ShowMessage(trUtf8("Programm gestartet, Server läuft nicht."));
-    ShowMessage(trUtf8("Klicke auf Start um den Server zu starten."));
+    ShowMessage(tr("Programm gestartet, Server läuft nicht."));
+    ShowMessage(tr("Klicke auf Start um den Server zu starten."));
 }
 
 MainWidget::~MainWidget()
@@ -42,16 +55,16 @@ void MainWidget::ServerStart()
 {
     if(ServerIsActive)
     {
-        ShowMessage(trUtf8("Server läuft bereits."));
+        ShowMessage(tr("Server läuft bereits."));
     }
     else
     {
         Server = new QTcpServer();
         ServerIsActive = true;
-        if(Server->listen(QHostAddress::AnyIPv6,7512))
+        if(Server->listen(QHostAddress::AnyIPv6,BoxPort->value()))
         {
             connect(Server, SIGNAL(newConnection()), this, SLOT(HandleNewConnection()));
-            ShowMessage(trUtf8("Server gestartet"));
+            ShowMessage(tr("Server gestartet"));
         }
         else
         {
@@ -59,29 +72,29 @@ void MainWidget::ServerStart()
             QString sMessage;
             if(sError.isEmpty())
             {
-                sMessage = trUtf8("Unbekannter Fehler beim Starten - ");
+                sMessage = tr("Unbekannter Fehler beim Starten - ");
                 QAbstractSocket::SocketError error = Server->serverError();
 
                 //error handling - incomplete
                 switch(error)
                 {
                 case QAbstractSocket::ConnectionRefusedError: sMessage.append(
-                                trUtf8("The connection was refused by the peer (or timed out)."));
+                                tr("The connection was refused by the peer (or timed out)."));
                     break;
                 case QAbstractSocket::RemoteHostClosedError: sMessage.append(
-                                trUtf8("The remote host closed the connection. Note that the client socket (i.e., this socket) will be closed after the remote close notification has been sent."));
+                                tr("The remote host closed the connection. Note that the client socket (i.e., this socket) will be closed after the remote close notification has been sent."));
                     break;
                 case QAbstractSocket::HostNotFoundError: sMessage.append(
-                                trUtf8("The host address was not found."));
+                                tr("The host address was not found."));
                     break;
                 case QAbstractSocket::SocketAccessError: sMessage.append(
-                                trUtf8("The socket operation failed because the application lacked the required privileges."));
+                                tr("The socket operation failed because the application lacked the required privileges."));
                     break;
                 case QAbstractSocket::SocketResourceError: sMessage.append(
-                                trUtf8("The local system ran out of resources (e.g., too many sockets)."));
+                                tr("The local system ran out of resources (e.g., too many sockets)."));
                     break;
                 case QAbstractSocket::UnknownSocketError: sMessage.append(
-                                trUtf8("An unidentified error occurred."));
+                                tr("An unidentified error occurred."));
                     break;
 
                 default:
@@ -92,7 +105,7 @@ void MainWidget::ServerStart()
             }
             else
             {
-                sMessage = trUtf8("Fehler beim Starten: %0").arg(Server->errorString());
+                sMessage = tr("Fehler beim Starten: %0").arg(Server->errorString());
             }
             ShowMessage(sMessage);
         }
@@ -103,7 +116,7 @@ void MainWidget::ServerStop()
 {
     if(ServerIsActive)
     {
-        QString sMessage = trUtf8("Der Server wurde beenden. Bye Bye ;-)\n");
+        QString sMessage = tr("Der Server wurde beenden. Bye Bye ;-)\n");
         QByteArray sData = sMessage.toUtf8();
         for(int i = 0; i < SocketList->count(); i++)
         {
@@ -116,11 +129,11 @@ void MainWidget::ServerStop()
         SocketList->clear();
         Server->deleteLater();
         ServerIsActive = false;
-        ShowMessage(trUtf8("Server gestoppt"));
+        ShowMessage(tr("Server gestoppt"));
     }
     else
     {
-        ShowMessage(trUtf8("Server läuft nicht."));
+        ShowMessage(tr("Server läuft nicht."));
     }
 }
 
@@ -129,7 +142,7 @@ void MainWidget::HandleNewConnection()
     Socket = Server->nextPendingConnection();
     SocketList->append(Socket);
     connect(Socket, SIGNAL(readyRead()), this, SLOT(HandleNewData()));
-    QString sMessage = trUtf8("Neue Verbindung Nummer %0").arg(SocketList->count());
+    QString sMessage = tr("Neue Verbindung Nummer %0").arg(SocketList->count());
     ShowMessage(sMessage);
     sMessage.append("\n");
     QByteArray sData = sMessage.toUtf8();
@@ -148,7 +161,7 @@ void MainWidget::HandleNewData()
         sData = Socket->readAll();
         if(sData.size())
         {
-            QString sText = trUtf8("Von Verbindung %0: %1").arg(i+1).arg(
+            QString sText = tr("Von Verbindung %0: %1").arg(i+1).arg(
                         QString::fromUtf8(sData));
             sTextList.append(sText);
         }
@@ -169,10 +182,10 @@ void MainWidget::HandleNewData()
 void MainWidget::ShowMessage(QString sMessage)
 {
     //Zeile anhängen
-    Display->append(sMessage);
+    EdtDisplay->append(sMessage);
 
     //AutoScroll
-    QTextCursor c = Display->textCursor();
+    QTextCursor c = EdtDisplay->textCursor();
     c.movePosition(QTextCursor::End);
-    Display->setTextCursor(c);
+    EdtDisplay->setTextCursor(c);
 }

@@ -2,7 +2,7 @@
 #define MAINWIDGET_H
 
 #include <QtGui>
-#include <QtNetwork/QtNetwork>
+#include <QtNetwork>
 
 class MainWidget : public QWidget
 {
@@ -10,14 +10,14 @@ class MainWidget : public QWidget
 
 private:
     //Layout
-    QVBoxLayout *VLayout;
-    QHBoxLayout *HLayout;
+    QVBoxLayout *LayMain;
+    QHBoxLayout *LayButtons, *LayConfig;
 
-    //Buttons
+    //Widgets
+    QTextEdit *EdtDisplay;
     QPushButton *BtnQuit, *BtnStart, *BtnStop;
-
-    //Display
-    QTextEdit *Display;
+    QLabel *LblPort;
+    QSpinBox *BoxPort;
 
     //Network
     QTcpServer *Server;
@@ -25,7 +25,7 @@ private:
     QTcpSocket *Socket;
     QList<QTcpSocket*> *SocketList;
 
-    //Funktionen
+    //Functions
     void ShowMessage(QString sMessage);
 
 
