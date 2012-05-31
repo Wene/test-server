@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QtNetwork>
+#include "chatserver.h"
 
 class MainWidget : public QWidget
 {
@@ -20,20 +21,20 @@ private:
     QSpinBox *BoxPort;
 
     //Network
-    QTcpServer *Server;
-    bool ServerIsActive;
-    QTcpSocket *Socket;
-    QList<QTcpSocket*> *SocketList;
-
-    //Functions
-    void ShowMessage(QString sMessage);
+    ChatServer *Server;
+//    QTcpServer *Server;
+//    bool ServerIsActive;
+//    QTcpSocket *Socket;
+//    QList<QTcpSocket*> *SocketList;
 
 
 private slots:
     void ServerStart();
     void ServerStop();
-    void HandleNewConnection();
-    void HandleNewData();
+    void handleLog(QString);
+
+//    void HandleNewConnection();
+//    void HandleNewData();
 
 public:
     MainWidget(QWidget *parent = 0);

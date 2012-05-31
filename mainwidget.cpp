@@ -38,11 +38,13 @@ MainWidget::MainWidget(QWidget *parent)
     connect(BtnStart, SIGNAL(clicked()), this, SLOT(ServerStart()));
     connect(BtnStop, SIGNAL(clicked()), this, SLOT(ServerStop()));
 
-    SocketList = new QList<QTcpSocket*>();
-    ServerIsActive = false;
+//    SocketList = new QList<QTcpSocket*>();
+//    ServerIsActive = false;
+    Server = new ChatServer();
+    connect(Server, SIGNAL(newLog(QString)), this, SLOT(handleLog(QString)));
 
-    ShowMessage(tr("Programm gestartet, Server läuft nicht."));
-    ShowMessage(tr("Klicke auf Start um den Server zu starten."));
+    handleLog(tr("Programm gestartet, Server läuft nicht."));
+    handleLog(tr("Klicke auf Start um den Server zu starten."));
 }
 
 MainWidget::~MainWidget()
@@ -53,9 +55,20 @@ MainWidget::~MainWidget()
 
 void MainWidget::ServerStart()
 {
+    if(!Server->isListening())
+    {
+        Server->setPort(BoxPort->value());
+        Server->startServer();
+    }
+    else
+    {
+        handleLog(tr("Server läuft bereits."));
+    }
+
+    /*
     if(ServerIsActive)
     {
-        ShowMessage(tr("Server läuft bereits."));
+        ShowLog(tr("Server läuft bereits."));
     }
     else
     {
@@ -64,7 +77,7 @@ void MainWidget::ServerStart()
         if(Server->listen(QHostAddress::AnyIPv6,BoxPort->value()))
         {
             connect(Server, SIGNAL(newConnection()), this, SLOT(HandleNewConnection()));
-            ShowMessage(tr("Server gestartet"));
+            ShowLog(tr("Server gestartet"));
         }
         else
         {
@@ -107,13 +120,24 @@ void MainWidget::ServerStart()
             {
                 sMessage = tr("Fehler beim Starten: %0").arg(Server->errorString());
             }
-            ShowMessage(sMessage);
+            ShowLog(sMessage);
         }
     }
+    */
 }
 
 void MainWidget::ServerStop()
 {
+    if(Server->isListening())
+    {
+        Server->stopServer();
+    }
+    else
+    {
+        handleLog(tr("Server nicht aktiv."));
+    }
+
+    /*
     if(ServerIsActive)
     {
         QString sMessage = tr("Der Server wurde beenden. Bye Bye ;-)\n");
@@ -129,21 +153,23 @@ void MainWidget::ServerStop()
         SocketList->clear();
         Server->deleteLater();
         ServerIsActive = false;
-        ShowMessage(tr("Server gestoppt"));
+        newLog(tr("Server gestoppt"));
     }
     else
     {
-        ShowMessage(tr("Server läuft nicht."));
+        newLog(tr("Server läuft nicht."));
     }
+    */
 }
 
+/*
 void MainWidget::HandleNewConnection()
 {
     Socket = Server->nextPendingConnection();
     SocketList->append(Socket);
     connect(Socket, SIGNAL(readyRead()), this, SLOT(HandleNewData()));
     QString sMessage = tr("Neue Verbindung Nummer %0").arg(SocketList->count());
-    ShowMessage(sMessage);
+    ShowLog(sMessage);
     sMessage.append("\n");
     QByteArray sData = sMessage.toUtf8();
     Socket->write(sData);
@@ -178,8 +204,9 @@ void MainWidget::HandleNewData()
     }
 
 }
+*/
 
-void MainWidget::ShowMessage(QString sMessage)
+void MainWidget::handleLog(QString sMessage)
 {
     //Zeile anhängen
     EdtDisplay->append(sMessage);

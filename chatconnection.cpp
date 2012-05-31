@@ -12,7 +12,12 @@ ChatConnection::ChatConnection(QTcpSocket *s, QObject *parent) :
     Socket = s;
     IsConnected = true;
     AskForNick();
-    connect(Socket, SIGNAL(aboutToClose()), this, SLOT(closeSocket()));
+    connect(Socket, SIGNAL(aboutToClose()), this, SLOT(sendCloseRequest()));
+}
+
+QString ChatConnection::nick()
+{
+    return sNick;
 }
 
 void ChatConnection::CloseAndDelete()
@@ -63,21 +68,14 @@ void ChatConnection::processData()
     }
 }
 
-void ChatConnection::closeSocket()
+void ChatConnection::sendCloseRequest()
 {
-    if(IsConnected)
-    {
-        Socket->close();
-        Socket->deleteLater();
-        IsConnected = false;
-        QString sMessage = tr("Verbindung mit %0 geschlossen.").arg(sNick);
-        emit newLog(sMessage);
-    }
+    emit aboutToClose(this);
 }
 
 void ChatConnection::setSocket(QTcpSocket *s)
 {
     Socket = s;
     IsConnected = true;
-    connect(Socket, SIGNAL(aboutToClose()), this, SLOT(closeSocket()));
+    connect(Socket, SIGNAL(aboutToClose()), this, SLOT(sendCloseRequest()));
 }

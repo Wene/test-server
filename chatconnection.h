@@ -11,6 +11,7 @@ public:
     explicit ChatConnection(QObject *parent = 0);
     ChatConnection(QTcpSocket *s, QObject *parent = 0);
     void setSocket(QTcpSocket *s);
+    QString nick();
 
 private:
     QString sNick;
@@ -20,6 +21,7 @@ private:
 signals:
     void newLog(QString);
     void newMessage(QString, QString);
+    void aboutToClose(ChatConnection*);
 
 public slots:
     void CloseAndDelete();
@@ -28,7 +30,7 @@ public slots:
 private slots:
     void processNick();
     void processData();
-    void closeSocket();
+    void sendCloseRequest();
 
 };
 
