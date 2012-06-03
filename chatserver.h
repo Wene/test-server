@@ -24,8 +24,8 @@ private:
 private slots:
     void handleNewConnection();
     void forwardLog(QString);
-    void forwardMessage(QString, QString);
     void closeConnection(ChatConnection*);
+    void handleMessage(QString, QString);
 
 signals:
     void newLog(QString);

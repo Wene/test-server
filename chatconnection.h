@@ -16,7 +16,7 @@ public:
 private:
     QString sNick;
     QTcpSocket *Socket;
-    bool IsConnected;
+    bool IsConnected, hasNick;
 
 signals:
     void newLog(QString);
@@ -25,10 +25,10 @@ signals:
 
 public slots:
     void CloseAndDelete();
-    void AskForNick();
+//    void AskForNick();
 
 private slots:
-    void processNick();
+//    void processNick();
     void processData();
     void sendCloseRequest();
 

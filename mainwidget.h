@@ -22,19 +22,11 @@ private:
 
     //Network
     ChatServer *Server;
-//    QTcpServer *Server;
-//    bool ServerIsActive;
-//    QTcpSocket *Socket;
-//    QList<QTcpSocket*> *SocketList;
-
 
 private slots:
     void ServerStart();
     void ServerStop();
     void handleLog(QString);
-
-//    void HandleNewConnection();
-//    void HandleNewData();
 
 public:
     MainWidget(QWidget *parent = 0);

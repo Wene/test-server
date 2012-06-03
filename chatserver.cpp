@@ -69,7 +69,7 @@ void ChatServer::handleNewConnection()
     Connection = new ChatConnection(Socket, this);          //Damit wird der Client auch gleich aufgefordert einen Nick anzugeben
     ConnectionList->append(Connection);
     connect(Connection, SIGNAL(newLog(QString)), this, SLOT(forwardLog(QString)));
-    connect(Connection, SIGNAL(newMessage(QString,QString)), this, SLOT(forwardMessage(QString,QString)));
+    connect(Connection, SIGNAL(newMessage(QString,QString)), this, SLOT(handleMessage(QString,QString)));
     connect(Connection, SIGNAL(aboutToClose(ChatConnection*)), this, SLOT(closeConnection(ChatConnection*)));
 }
 
@@ -85,10 +85,13 @@ void ChatServer::closeConnection(ChatConnection *conn)
 
 void ChatServer::forwardLog(QString sMessage)
 {
-    newLog(sMessage);
+    emit newLog(sMessage);
 }
 
-void ChatServer::forwardMessage(QString nick, QString message)
+void ChatServer::handleMessage(QString sNick, QString sText)
 {
-    newMessage(nick, message);
+    QString sMessage = tr("Neue Nachricht von %0: %1")
+            .arg(sNick)
+            .arg(sText);
+    emit newLog(sMessage);
 }
