@@ -33,7 +33,7 @@ void ChatConnection::setSocket(QTcpSocket *s)
     Socket->write(sMessage.toUtf8());
     hasNick = false;
     connect(Socket, SIGNAL(readyRead()), this, SLOT(processData()));
-    connect(Socket, SIGNAL(aboutToClose()), this, SLOT(sendCloseRequest()));
+    connect(Socket, SIGNAL(readChannelFinished()), this, SLOT(sendCloseRequest()));
 }
 
 void ChatConnection::CloseAndDelete()

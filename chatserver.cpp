@@ -68,11 +68,12 @@ void ChatServer::stopServer()
 void ChatServer::handleNewConnection()
 {
     QTcpSocket *Socket = Server->nextPendingConnection();
-    Connection = new ChatConnection(Socket, this);          //Damit wird der Client auch gleich aufgefordert einen Nick anzugeben
+    Connection = new ChatConnection(this);
     ConnectionList->append(Connection);
     connect(Connection, SIGNAL(newLog(QString)), this, SLOT(forwardLog(QString)));
     connect(Connection, SIGNAL(newMessage(QString,QString)), this, SLOT(handleMessage(QString,QString)));
     connect(Connection, SIGNAL(aboutToClose(ChatConnection*)), this, SLOT(closeConnection(ChatConnection*)));
+    Connection->setSocket(Socket);
 }
 
 void ChatServer::closeConnection(ChatConnection *conn)
