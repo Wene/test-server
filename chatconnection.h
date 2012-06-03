@@ -25,10 +25,9 @@ signals:
 
 public slots:
     void CloseAndDelete();
-//    void AskForNick();
+    void sendMessage(QString);
 
 private slots:
-//    void processNick();
     void processData();
     void sendCloseRequest();
 

@@ -17,6 +17,7 @@ ChatServer::ChatServer(qint16 port, QObject *parent) :
     bActive = false;
 }
 
+//setter and getter
 void ChatServer::setPort(qint16 port)
 {
     if(port < 1024)
@@ -29,7 +30,7 @@ bool ChatServer::isListening()
     return bActive;
 }
 
-//Slots
+//public slots
 void ChatServer::startServer()
 {
     if(!bActive)
@@ -63,6 +64,7 @@ void ChatServer::stopServer()
     }
 }
 
+//private slots
 void ChatServer::handleNewConnection()
 {
     QTcpSocket *Socket = Server->nextPendingConnection();
@@ -94,4 +96,15 @@ void ChatServer::handleMessage(QString sNick, QString sText)
             .arg(sNick)
             .arg(sText);
     emit newLog(sMessage);
+    for(int i = 0; i < ConnectionList->count(); i++)
+    {
+        Connection = ConnectionList->at(i);
+        if(sNick != Connection->nick())
+        {
+            sMessage = tr("%0> %1")
+                    .arg(sNick)
+                    .arg(sText);
+            Connection->sendMessage(sMessage);
+        }
+    }
 }
